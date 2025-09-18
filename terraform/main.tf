@@ -230,6 +230,72 @@ resource "aws_security_group" "app_sg" {
   }
 }
 
+# Scylla SG
+resource "aws_security_group" "scylla_sg" {
+  vpc_id = aws_vpc.main.id
+  name   = "${var.project}-${var.environment}-scylla-sg"
+
+  # Bastion -> Scylla (SSH)
+  ingress {
+    from_port       = 22
+    to_port         = 22
+    protocol        = "tcp"
+    security_groups = [aws_security_group.bastion_sg.id]
+  }
+
+  # App -> Scylla (Cassandra client port)
+  ingress {
+    from_port       = 9042
+    to_port         = 9042
+    protocol        = "tcp"
+    security_groups = [aws_security_group.app_sg.id]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "${var.project}-${var.environment}-scylla-sg"
+  }
+}
+
+# Redis SG
+resource "aws_security_group" "redis_sg" {
+  vpc_id = aws_vpc.main.id
+  name   = "${var.project}-${var.environment}-redis-sg"
+
+  # Bastion -> Redis (SSH)
+  ingress {
+    from_port       = 22
+    to_port         = 22
+    protocol        = "tcp"
+    security_groups = [aws_security_group.bastion_sg.id]
+  }
+
+  # App -> Redis (default port)
+  ingress {
+    from_port       = 6379
+    to_port         = 6379
+    protocol        = "tcp"
+    security_groups = [aws_security_group.app_sg.id]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "${var.project}-${var.environment}-redis-sg"
+  }
+}
+
 # ------------------------
 # Application Load Balancer
 # ------------------------
@@ -393,9 +459,9 @@ resource "aws_instance" "app" {
       "curl 'https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip' -o 'awscliv2.zip'",
       "unzip -o awscliv2.zip",
       "sudo ./aws/install",
-      "aws s3 cp s3://jenkinsbackup085/setup.sh /home/ubuntu/setup.sh",
-      "chmod +x /home/ubuntu/setup.sh",
-      "bash /home/ubuntu/setup.sh"
+      "aws s3 cp s3://jenkinsbackup085/setup1.sh /home/ubuntu/setup.sh",
+      "chmod +x /home/ubuntu/setup1.sh",
+      "bash /home/ubuntu/setup1.sh"
     ]
   }
 
@@ -407,7 +473,7 @@ resource "aws_instance" "scylla" {
   ami                    = "ami-0bbdd8c17ed981ef9"
   instance_type          = var.scylla_instance_type
   subnet_id              = aws_subnet.private_b.id
-  vpc_security_group_ids = [aws_security_group.app_sg.id]
+  vpc_security_group_ids = [aws_security_group.scylla_sg.id]
   key_name               = "vmkey"
 
   depends_on = [aws_route_table_association.private_assoc_b]
@@ -440,7 +506,7 @@ resource "aws_instance" "redis" {
   ami                    = "ami-0bbdd8c17ed981ef9"
   instance_type          = var.redis_instance_type
   subnet_id              = aws_subnet.private_b.id
-  vpc_security_group_ids = [aws_security_group.app_sg.id]
+  vpc_security_group_ids = [aws_security_group.redis_sg.id]
   key_name               = "vmkey"
 
   depends_on = [aws_route_table_association.private_assoc_b]
