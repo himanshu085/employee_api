@@ -440,7 +440,12 @@ resource "aws_instance" "app" {
     volume_type = "gp3"
   }
 
-  depends_on = [aws_route_table_association.private_assoc_a]
+  # ensure App waits for Scylla + Redis to finish
+  depends_on = [
+    aws_instance.scylla,
+    aws_instance.redis,
+    aws_route_table_association.private_assoc_a
+  ]
 
   connection {
     type                = "ssh"
