@@ -1,10 +1,10 @@
 pipeline {
     agent any
     environment {
-        GIT_REPO        = "https://github.com/himanshu085/employee-api.git"
+        GIT_REPO        = "https://github.com/himanshu085/employee_api.git"
         GIT_CRED        = "git-credential"
-        DOCKER_IMAGE    = "employee-api:latest"
-        DOCKER_REGISTRY = "himanshu085/employee-service"
+        DOCKER_IMAGE    = "employee_api:latest"
+        DOCKER_REGISTRY = "himanshu085/employee_service"
         DOCKER_CRED     = "docker-hub-credentials"
         TERRAFORM_DIR   = "terraform"
     }
