@@ -398,7 +398,7 @@ resource "aws_iam_role_policy" "app_ssm_policy" {
           "ssm:GetParameter",
           "ssm:GetParameters"
         ],
-        Resource = "arn:aws:ssm:us-east-1:891612580887:parameter/employee-api/github-pat"
+        Resource = "arn:aws:ssm:us-east-1:891612580887:parameter/employee_api/github-pat"
       }
     ]
   })
