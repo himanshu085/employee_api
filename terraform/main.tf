@@ -464,7 +464,7 @@ resource "aws_instance" "app" {
       "curl 'https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip' -o 'awscliv2.zip'",
       "unzip -o awscliv2.zip",
       "sudo ./aws/install",
-      "aws s3 cp s3://jenkinsbackup085/setup1.sh /home/ubuntu/setup.sh",
+      "aws s3 cp s3://jenkinsbackup085/setup1.sh /home/ubuntu/setup1.sh",
       "chmod +x /home/ubuntu/setup1.sh",
       "bash /home/ubuntu/setup1.sh"
     ]
